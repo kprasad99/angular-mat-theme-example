@@ -1,0 +1,244 @@
+# Angular Custom Material Theme example
+
+An step by step example to create and customize angular material themes and icons.
+
+== Create material application.
+
+* Create a angular application.
++
+[source, shell]
+----
+$ ng new angular-mat-theme-example --prefix k
+----
+
+* Go to app directory
++
+[source, shell]
+----
+$ cd angular-mat-theme-example
+----
+
+* Add angular pwa library
++
+[source, shell]
+----
+$ ng add @angular/pwa
+----
+
+* Add `@angular/flex-layout` and `material-design-icons-iconfont` library
++
+[source, shell]
+----
+$ npm install @angular/flex-layout material-design-icons-iconfont --save
+----
++
+NOTE: flex-layout is not supported by all browsers. I'm using `material-design-icons-iconfont` for offline material icons. 
+
+* Add material library, while installing library it will prompt for enabling `hammerjs` and browser animation, choose yes. and also it will prompt to choose theme. select **custom theme **.
++
+[source, shell]
+----
+$ npm add @angular/material
+----
+
+
+== Customize material theme.
+
+* When installing `@angular/material` library, a `custom-theme.scss` file would have generated in directory `src`.
+
+* Open `custom-theme.scss` file, the file already would contain a `material-light-theme` object defined with  `primary`, `$accent`, `$warn` variables initialized with default color palettes, edit these variables by selecting the color palettes from materail design color palettes. You can choose color palettes from https://material.io/tools/color/#!/?view.left=0&view.right=0[here] or https://material.io/design/color/the-color-system.html#tools-for-picking-colors[from here] or https://material-ui.com/style/color/[here] or https://www.materialpalette.com/[here]
+
+
+=== Using Multiple theme
+
+* Open `custom-theme.scss` and create another set of `$primary` `$accent` and `$warn` variables with color palettes initialized, in my case inorder to have both light theme and dark theme. I'm creating dark theme as secondary theme.
++
+[source, scss]
+----
+angular-mat-theme-example-dark-primary: mat-palette($mat-cyan, 800, 100, 800);
+$angular-mat-theme-example-dark-accent: mat-palette($mat-deep-orange, 500, A100, 500);
+
+// The warn palette is optional (defaults to red).
+$angular-mat-theme-example-dark-warn: mat-palette($mat-red);
+
+----
+
+* Create theme, in my case creating material dark theme by importing palettes to `mat-dark-theme` as shown below.
++
+[source, scss]
+----
+$angular-mat-theme-example-dark-theme: mat-dark-theme($angular-mat-theme-example-dark-primary, $angular-mat-theme-example-dark-accent, $angular-mat-theme-example-dark-warn);
+----
+* Finally include the theme inside a css class as shown below.
++
+[source, scss]
+----
+.k-dark {
+    @include angular-material-theme($angular-mat-theme-example-dark-theme);
+}
+----
+
+* Now you can apply the secondary theme on the pages if the section is enclosed by class under which theme was included, in my case its `k-dark`.
++
+[source, html]
+----
+<div class="k-dark">
+    <mat-card></mat-card>
+</div>
+----
+
+=== Customize background color of a dark theme( This can be applied to foreground color as well).
+
+* Get back ground theme object.
++
+[source, scss]
+----
+$angular-mat-theme-background: map_get($angular-mat-theme-example-dark-theme, background);
+----
+* Get custom color object.
++
+[source, scss]
+----
+$custom-background-color: map_get($mat-cyan, 800);
+----
+
+* Update theme background object, in my case I'm updating both background color as well as background color for card.
++
+[source, scss]
+----
+$angular-mat-theme-background: map_merge($angular-mat-theme-background, (background: $custom-background-color));
+$angular-mat-theme-background: map_merge($angular-mat-theme-background, (card: $custom-background-color));
+----
+
+* Import the update background theme objecto to theme object.
++
+[source, scss]
+----
+$angular-mat-theme-example-dark-theme: map_merge($angular-mat-theme-example-dark-theme, (background: $angular-mat-theme-background));
+----
+
+
+== Using offline Material Icons
+
+* Offline material icons can be used by installing `material-design-icons-iconfont` which we have already installed in creating the application.
+
+* Now remove the maerial icon css link from index.html.
++
+[source, html]
+----
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+----
+* Import the material icon to scss in `custom-theme.scss`
++
+[source, scss]
+----
+$material-design-icons-font-path: '~material-design-icons-iconfont/dist/fonts/';
+ 
+@import '~material-design-icons-iconfont/src/material-design-icons';
+----
+
+=== Using svg icons in mat-icon
+
+* Copy the svg icon to assets directory, in my case I had downloaded svg icon from https://materialdesignicons.com/[here] and placed it in assets directory.
+
+* In AppModule [or for that matter in any Component or Service] in constructor inject `matIconRegistry` and `domSanitizer`. and in constructor register the icon to mat registry as shown below.
++
+[source, typescript]
+----
+  constructor(
+    private matIconRegistry: MatIconRegistry,
+    private domSanitizer: DomSanitizer
+  ) {
+    this.matIconRegistry.addSvgIcon(
+      'k_icon',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/k_icon.svg')
+    );
+  }
+}
+----
+
+* Sanitizer requires `HttpClient` hence import `HttpClientModule`
++
+[source, typescript]
+----
+import { BrowserModule, DomSanitizer } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { OverlayContainer } from '@angular/cdk/overlay';
+
+import { FlexLayoutModule } from '@angular/flex-layout';
+import {
+  MatToolbarModule,
+  MatRippleModule,
+  MatIconModule, MatButtonModule, MatMenuModule, MatDividerModule, MatCardModule, MatTabsModule, MatButtonToggleModule, MatIconRegistry
+} from '@angular/material';
+import { CardComponent } from './card/card.component';
+import { ButtonsComponent } from './buttons/buttons.component';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    CardComponent,
+    ButtonsComponent
+  ],
+  imports: [
+    BrowserModule,
+    FlexLayoutModule,
+    AppRoutingModule,
+    HttpClientModule,
+    MatCardModule, MatTabsModule, FormsModule, MatButtonToggleModule,
+    MatToolbarModule, MatRippleModule, MatIconModule, MatButtonModule, MatMenuModule, MatDividerModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    BrowserAnimationsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule {
+    constructor(
+    private matIconRegistry: MatIconRegistry,
+    private domSanitizer: DomSanitizer
+  ) {
+    this.matIconRegistry.addSvgIcon(
+      'k_icon',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/k_icon.svg')
+    );
+  }
+}
+----
+
+* Now you can use svgIcon in `mat-icon` as shown below.
++
+[source, html]
+----
+<mat-icon svgIcon="k_icon"></mat-icon>
+----
+
+== Useful Links
+
+=== Material
+* https://material.io/tools/color/#!/?view.left=0&view.right=0
+* https://material.io/design/color/the-color-systemhtml#tools-for-picking-colors
+* https://material-ui.com/style/color/
+* https://www.materialpalette.com/
+* https://material.io/design/color/#
+* https://material.angular.io/
+* https://material.angular.io/guide/theming
+
+=== Flex Layout
+
+* https://github.com/angular/flex-layout
+* https://tburleson-layouts-demos.firebaseapp.com/#/docs
+
+=== Material Icons
+
+* https://github.com/jossef/material-design-icons-iconfont
+* https://materialdesignicons.com/

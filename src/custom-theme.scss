@@ -1,0 +1,95 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@import '~@angular/material/theming';
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core();
+
+$material-design-icons-font-path: '~material-design-icons-iconfont/dist/fonts/';
+ 
+@import '~material-design-icons-iconfont/src/material-design-icons';
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$angular-mat-theme-example-primary: mat-palette($mat-blue-grey, 500, 100, 700);
+$angular-mat-theme-example-accent: mat-palette($mat-deep-orange, 500, A100, 500);
+
+// The warn palette is optional (defaults to red).
+$angular-mat-theme-example-warn: mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$angular-mat-theme-example-theme: mat-light-theme($angular-mat-theme-example-primary, $angular-mat-theme-example-accent, $angular-mat-theme-example-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($angular-mat-theme-example-theme);
+
+
+$angular-mat-theme-example-dark-primary: mat-palette($mat-cyan, 800, 100, 800);
+$angular-mat-theme-example-dark-accent: mat-palette($mat-deep-orange, 500, A100, 500);
+
+// The warn palette is optional (defaults to red).
+$angular-mat-theme-example-dark-warn: mat-palette($mat-red);
+
+
+
+/**
+
+// Creates a container object for a dark theme to be given to individual component theme mixins.
+@function mat-dark-theme($primary, $accent, $warn: mat-palette($mat-red)) {
+  @return (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+    is-dark: true,
+    foreground: $mat-dark-theme-foreground,
+    background: $mat-dark-theme-background,
+  );
+}
+
+
+$mat-dark-theme-background: (
+  status-bar: black,
+  app-bar:    map_get($mat-cyan, 800),
+  background: map_get($mat-cyan, 800),
+  hover:      rgba(white, 0.04), // TODO(kara): check style with Material Design UX
+  card:       map_get($mat-cyan, 800),
+  dialog:     map_get($mat-cyan, 800),
+  disabled-button: rgba(white, 0.12),
+  raised-button: map-get($mat-cyan, 800),
+  focused-button: $light-focused,
+  selected-button: map_get($mat-cyan, 900),
+  selected-disabled-button: map_get($mat-cyan, 800),
+  disabled-button-toggle: black,
+  unselected-chip: map_get($mat-cyan, 700),
+  disabled-list-option: black,
+);
+**/
+
+
+$angular-mat-theme-example-dark-theme: mat-dark-theme($angular-mat-theme-example-dark-primary, $angular-mat-theme-example-dark-accent, $angular-mat-theme-example-dark-warn);
+
+// get dark-theme-background from theme
+$angular-mat-theme-background: map_get($angular-mat-theme-example-dark-theme, background);
+
+$custom-background-color: map_get($mat-cyan, 800);
+
+
+$angular-mat-theme-background: map_merge($angular-mat-theme-background, (background: $custom-background-color));
+$angular-mat-theme-background: map_merge($angular-mat-theme-background, (card: $custom-background-color));
+$angular-mat-theme-example-dark-theme: map_merge($angular-mat-theme-example-dark-theme, (background: $angular-mat-theme-background));
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+
+
+.k-dark {
+    @include angular-material-theme($angular-mat-theme-example-dark-theme);
+}
